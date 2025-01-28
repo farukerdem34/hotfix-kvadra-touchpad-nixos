@@ -5,10 +5,10 @@ KVADRA NAU LE14U and similar notebooks.
 
 ## The problem
 
-On this notebook, the touchpad stops functioning after some idle time
+On these notebooks, the touchpad stops functioning after some idle time
 (10-30 minutes).
 
-he notebook is equipped with an Intel i5-1235U CPU, four Intel
+The notebook is equipped with an Intel i5-1235U CPU, four Intel
 Corporation Alder Lake PCH Serial IO I2C controllers, and a SYNA3602
 touchpad connected via the I2C serial bus.
 
@@ -42,6 +42,8 @@ handlers:
 Disabling IRQ #27
 ```
 
+## Analysis
+
 Examining the source code for the i2c_dw_isr routine (located in
 drivers/i2c/busses/i2c-designware-master.c), we find the following code:
 
@@ -64,10 +66,10 @@ static irqreturn_t i2c_dw_isr(int this_irq, void *dev_id)
 }
 ```
 
-It appears that when an interrupt occurs, i2c_dw_isr cannot recognize it
-as its own (which may be normal; due to the asynchronous nature of
-interrupt delivery, spurious interrupts can occasionally happen) and
-returns IRQ_NONE. This leads the kernel to consider the interrupt
+It appears that when an interrupt occurs, i2c_dw_isr fails to recognize it
+as its own (which may be normal due to the asynchronous nature of
+interrupt delivery; spurious interrupts can occasionally occur) and
+returns `IRQ_NONE`. This leads the kernel to consider the interrupt
 unhandled and disable it, resulting in the touchpad (and the entire I2C
 stack, though the touchpad issue is more noticeable) ceasing to
 function.
@@ -82,12 +84,12 @@ A similar issue has been reported for Arch Linux against kernel version
 
   * https://bbs.archlinux.org/viewtopic.php?id=302348
 
-## The solution
+## The Solution
 
 This simple module registers itself as a handler for all IRQs used by
 the I2C controllers installed in the system.
 
-The added interrupt handler does nothing but always returns IRQ_HANDLED,
+The added interrupt handler does nothing but always returns `IRQ_HANDLED`,
 effectively preventing the kernel from disabling these interrupts.
 
 Please note that this approach may yield one of two results:
