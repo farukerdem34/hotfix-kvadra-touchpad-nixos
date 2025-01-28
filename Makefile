@@ -12,7 +12,8 @@ all:
 clean:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
 
-install:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules_install
+install: install_module
 	install -Dm644 hotfix-kvadra-touchpad.conf /usr/lib/modules-load.d/hotfix-kvadra-touchpad.conf
 
+install_module:
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules_install
