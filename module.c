@@ -1,3 +1,13 @@
+// hotfix-kvadra-touchpad
+//
+// This kernel module provides a hotfix for touchpad issues
+// KVADRA NAU LE14U and similar notebooks.
+//
+// See README.md for details
+//
+// Copyright (C) 2025 and up by Alexander Pevzner (pzz@apevzner.com)
+// See LICENSE for license terms and conditions
+
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/proc_fs.h>
